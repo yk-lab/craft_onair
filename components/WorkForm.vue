@@ -133,8 +133,12 @@ const onSubmit = async (_e: FormSubmitEvent<Schema>) => {
   }).then((pdf) => {
     const blob = new Blob([new Uint8Array(pdf.buffer)], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-    window.open(url);
-    URL.revokeObjectURL(url);
+    const newWindow = window.open(url);
+    if (newWindow) {
+      newWindow.addEventListener('load', () => {
+        URL.revokeObjectURL(url);
+      });
+    }
   });
 };
 </script>
