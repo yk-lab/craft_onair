@@ -70,6 +70,9 @@ import { getTemplate } from '~/utils/pdf';
 
 const NOTO_SANS_JP_URL = 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf';
 
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+
 const schema = z.object({
   title: z.string(),
   image: z.instanceof(File),
@@ -91,13 +94,28 @@ const borderColors = [
   { label: '茶', value: '#cd853f' },
 ];
 
-const readFile = async (file: File) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+const loadImage = async (file: File) => {
+  const image = new Image();
+  const url = URL.createObjectURL(file);
+  image.src = url;
+
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = reject;
   });
+};
+
+const convertToJpg = async (file: File) => {
+  const image = await loadImage(file);
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const ctx = canvas.getContext('2d');
+  ctx?.drawImage(image, 0, 0);
+  return canvas.toDataURL('image/jpeg');
 };
 
 const handleFileChange = (e: Event) => {
@@ -108,37 +126,51 @@ const handleFileChange = (e: Event) => {
 };
 
 const onSubmit = async (_e: FormSubmitEvent<Schema>) => {
-  const { generate } = await import('@pdfme/generator');
+  isLoading.value = true;
+  error.value = null;
 
-  const imageBase64 = state.value.image ? await readFile(state.value.image) : '';
+  try {
+    const { generate } = await import('@pdfme/generator');
 
-  generate({
-    template: getTemplate(state.value.borderColor ?? '#000000'),
-    inputs: [{
-      name: state.value.title,
-      image: imageBase64,
-    }],
-    plugins: { text, rectangle, image },
-    options: {
-      font: {
-        ...getDefaultFont(),
-        NotoSansJP: {
-          fallback: false,
-          data: NOTO_SANS_JP_URL,
+    const imageBase64 = state.value.image ? await convertToJpg(state.value.image) : '';
 
+    generate({
+      template: getTemplate(state.value.borderColor ?? '#000000'),
+      inputs: [{
+        name: state.value.title,
+        image: imageBase64,
+      }],
+      plugins: { text, rectangle, image },
+      options: {
+        font: {
+          ...getDefaultFont(),
+          NotoSansJP: {
+            fallback: false,
+            data: NOTO_SANS_JP_URL,
+          },
         },
+        lang: 'ja',
       },
-      lang: 'ja',
-    },
-  }).then((pdf) => {
-    const blob = new Blob([new Uint8Array(pdf.buffer)], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const newWindow = window.open(url);
-    if (newWindow) {
-      newWindow.addEventListener('load', () => {
-        URL.revokeObjectURL(url);
-      });
-    }
-  });
+    }).then((pdf) => {
+      const blob = new Blob([new Uint8Array(pdf.buffer)], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const newWindow = window.open(url);
+      if (newWindow) {
+        newWindow.addEventListener('load', () => {
+          URL.revokeObjectURL(url);
+        });
+      }
+    }).catch((err) => {
+      console.error('PDF生成エラー:', err);
+      error.value = 'PDFの生成に失敗しました';
+    });
+  }
+  catch (err) {
+    console.error('処理エラー:', err);
+    error.value = '処理中にエラーが発生しました。';
+  }
+  finally {
+    isLoading.value = false;
+  }
 };
 </script>

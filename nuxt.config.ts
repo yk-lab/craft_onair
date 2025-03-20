@@ -44,7 +44,7 @@ export default defineNuxtConfig({
     colorMode: false,
   },
 
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-03-21',
 
   eslint: {
     config: {
@@ -61,5 +61,10 @@ export default defineNuxtConfig({
   },
 
   security: {
+    headers: {
+      contentSecurityPolicy: {
+        'img-src': ['\'self\'', 'data:', 'blob:'],
+      },
+    },
   },
 });
