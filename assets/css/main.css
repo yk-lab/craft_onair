@@ -1,2 +1,7 @@
 @import "tailwindcss" theme(static);
 @import "@nuxt/ui-pro";
+
+
+body {
+  background-color: var(--color-gray-100);
+}
