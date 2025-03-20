@@ -1,12 +1,65 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
 
   modules: [
+    '@formkit/auto-animate/nuxt',
     '@nuxt/eslint',
     '@nuxt/icon',
     '@nuxt/scripts',
-    '@nuxt/test-utils'
-  ]
-})
+    '@nuxt/test-utils',
+    '@nuxt/ui-pro',
+    'nuxt-og-image',
+    'nuxt-security',
+    'nuxt-site-config',
+  ],
+
+  devtools: { enabled: true },
+
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: 'ja',
+        prefix: 'og: https://ogp.me/ns#',
+        class: 'min-h-screen',
+      },
+      bodyAttrs: {
+        class: 'min-h-screen',
+      },
+      title: '工作オンエア ジェネレータ',
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      meta: [
+        { property: 'og:type', content: 'website' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+      ],
+    },
+    rootAttrs: {
+      class: 'min-h-full',
+    },
+  },
+
+  css: ['~/assets/css/main.css'],
+
+  ui: {
+    colorMode: false,
+  },
+
+  compatibilityDate: '2024-11-01',
+
+  eslint: {
+    config: {
+      stylistic: {
+        semi: true,
+        quotes: 'single',
+        commaDangle: 'always-multiline',
+      },
+    },
+  },
+
+  ogImage: {
+    fonts: ['BIZ UDPGothic:400'],
+  },
+
+  security: {
+  },
+});

@@ -9,15 +9,22 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@formkit/auto-animate": "0.8.2",
     "@nuxt/eslint": "1.2.0",
     "@nuxt/icon": "1.11.0",
     "@nuxt/scripts": "0.11.2",
     "@nuxt/test-utils": "3.17.2",
-    "@unhead/vue": "^2.0.0-rc.8",
-    "eslint": "^9.0.0",
-    "nuxt": "^3.16.1",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "@nuxt/ui-pro": "3.0.0",
+    "@unhead/vue": "2.0.0-rc.13",
+    "eslint": "9.22.0",
+    "nuxt": "3.16.1",
+    "nuxt-og-image": "5.0.5",
+    "nuxt-security": "2.2.0",
+    "nuxt-site-config": "3.1.7",
+    "oxlint": "0.16.1",
+    "typescript": "5.8.2",
+    "vue": "3.5.13",
+    "vue-router": "4.5.0"
   }
 }
