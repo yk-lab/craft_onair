@@ -9,7 +9,7 @@
       label="作品名"
       name="title"
     >
-      <UInput
+      <UTextarea
         v-model="state.title"
         class="w-full"
         placeholder="作品名を入力してください"
