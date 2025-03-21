@@ -66,6 +66,7 @@ import type { FormSubmitEvent } from '@nuxt/ui';
 import { getDefaultFont } from '@pdfme/common';
 import { image, rectangle, text } from '@pdfme/schemas';
 import * as z from 'zod';
+import { convertToJpg } from '~/utils/file';
 import { getTemplate } from '~/utils/pdf';
 
 const NOTO_SANS_JP_URL = 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf';
@@ -94,30 +95,6 @@ const borderColors = [
   { label: '茶', value: '#cd853f' },
 ];
 
-const loadImage = async (file: File) => {
-  const image = new Image();
-  const url = URL.createObjectURL(file);
-  image.src = url;
-
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    image.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(image);
-    };
-    image.onerror = reject;
-  });
-};
-
-const convertToJpg = async (file: File) => {
-  const image = await loadImage(file);
-  const canvas = document.createElement('canvas');
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const ctx = canvas.getContext('2d');
-  ctx?.drawImage(image, 0, 0);
-  return canvas.toDataURL('image/jpeg');
-};
-
 const handleFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (input.files && input.files[0]) {
@@ -132,13 +109,13 @@ const onSubmit = async (_e: FormSubmitEvent<Schema>) => {
   try {
     const { generate } = await import('@pdfme/generator');
 
-    const imageBase64 = state.value.image ? await convertToJpg(state.value.image) : '';
+    const dataUrl = state.value.image ? await convertToJpg(state.value.image) : '';
 
     generate({
       template: getTemplate(state.value.borderColor ?? '#000000'),
       inputs: [{
         name: state.value.title,
-        image: imageBase64,
+        image: dataUrl,
       }],
       plugins: { text, rectangle, image },
       options: {

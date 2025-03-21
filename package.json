@@ -20,6 +20,7 @@
     "@pdfme/generator": "5.3.14",
     "@pdfme/schemas": "5.3.14",
     "@unhead/vue": "2.0.0-rc.13",
+    "canvg": "4.0.3",
     "eslint": "9.22.0",
     "nuxt": "3.16.1",
     "nuxt-og-image": "5.0.5",
